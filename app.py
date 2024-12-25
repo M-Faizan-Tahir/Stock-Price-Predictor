@@ -4,7 +4,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from tensorflow.keras.models import load_model
 import os
-import base64
 
 def predict_future(model, last_sequence, scaler=None, steps=30):
     """Predict future stock prices."""
@@ -42,58 +41,47 @@ company_models = {
     }
 }
 
+st.title("Stock Prediction Dashboard")
 
-st.sidebar.subheader("Company Selection")
-for company, details in company_models.items():
-    st.sidebar.markdown(
-    f"""
-    <div style="text-align: center; margin-bottom: 10px;">
-        <img src="data:image/png;base64,{base64.b64encode(open(details['logo'], 'rb').read()).decode()}" 
-             style="border-radius: 50%; width: 50px; height: 50px;">
-        <p style="font-size: 14px; font-weight: bold;">{company}</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Company selection dropdown
+selected_company = st.selectbox("", options=['Select a Company'] + list(company_models.keys()))
 
-    if st.sidebar.button(company, key=f"sidebar_{company}"):
-        st.session_state['selected_company'] = company
-
+if selected_company != 'Select a Company':
+    st.session_state['selected_company'] = selected_company
+else:
+    st.session_state['selected_company'] = None
 
 if st.session_state['selected_company']:
-    selected_company = st.session_state['selected_company']
-    st.title(f"{selected_company} Stock Prediction Dashboard")
+    st.title(f"{st.session_state['selected_company']} Stock Prediction Dashboard")
 
-   
-    model_data = company_models[selected_company]
+    model_data = company_models[st.session_state['selected_company']]
     try:
         model = load_model(model_data['model'])
         last_sequence = model_data['last_sequence']
     except Exception as e:
-        st.error(f"Error loading data for {selected_company}: {e}")
+        st.error(f"Error loading data for {st.session_state['selected_company']}: {e}")
         st.stop()
 
-    
     st.image(model_data['logo'], width=100)
-    st.markdown(f"### {selected_company}")
+    st.markdown(f"### {st.session_state['selected_company']}")
 
- 
+    # Slider for prediction days
     num_days = st.slider("Prediction Days", min_value=1, max_value=30, value=7)
 
-   
+    # Predict future stock prices
     predictions = predict_future(model, last_sequence, steps=num_days)
 
-  
+    # Create predicted data DataFrame
     future_dates = pd.date_range(start=pd.Timestamp.today(), periods=num_days)
     predicted_data = pd.DataFrame({"Date": future_dates, "Predicted Close": predictions.flatten()})
 
-    
-    st.subheader(f"{selected_company} Predicted Line Chart")
+    # Display line chart
+    st.subheader(f"{st.session_state['selected_company']} Predicted Line Chart")
     fig_line = go.Figure()
     fig_line.add_trace(go.Scatter(x=predicted_data['Date'], y=predicted_data['Predicted Close'], mode='lines', name='Predicted Close'))
     st.plotly_chart(fig_line)
 
-  
+    # Create candlestick chart data
     candlestick_data = pd.DataFrame({
         "Date": predicted_data["Date"],
         "Open": predicted_data["Predicted Close"] * 0.99,  
@@ -102,8 +90,8 @@ if st.session_state['selected_company']:
         "Close": predicted_data["Predicted Close"]
     })
 
-    
-    st.subheader(f"{selected_company} Predicted Candlestick Chart")
+    # Display candlestick chart
+    st.subheader(f"{st.session_state['selected_company']} Predicted Candlestick Chart")
     fig_candle = go.Figure(data=[
         go.Candlestick(
             x=candlestick_data['Date'],
@@ -116,7 +104,7 @@ if st.session_state['selected_company']:
     ])
     st.plotly_chart(fig_candle)
 
- 
+    # Display predicted values table
     st.subheader("Predicted Values")
     st.write(predicted_data)
 
