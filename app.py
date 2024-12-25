@@ -38,6 +38,26 @@ company_models = {
         "model": os.path.join("Trained Models", "Keras", "MasterCard_model.keras"),
         "last_sequence": np.load(os.path.join("Trained Models", "Last Sequences", "MasterCard_last_sequence.npy")),
         "logo": os.path.join("Logo", "mastercard logo.png")
+    },
+    "Ferrero": {
+        "model": os.path.join("Trained Models", "Keras", "ferrero_model.keras"),
+        "last_sequence": np.load(os.path.join("Trained Models", "Last Sequences", "ferrero_last_sequence.npy")),
+        "logo": os.path.join("Logo", "ferrero_logo.svg")
+    },
+    "Netflix": {
+        "model": os.path.join("Trained Models", "Keras", "Netflix_model.keras"),
+        "last_sequence": np.load(os.path.join("Trained Models", "Last Sequences", "Netflix_last_sequence.npy")),
+        "logo": os.path.join("Logo", "netflix_logo.png")
+    },
+    "Tesla": {
+        "model": os.path.join("Trained Models", "Keras", "Tesla_model.keras"),
+        "last_sequence": np.load(os.path.join("Trained Models", "Last Sequences", "Tesla_last_sequence.npy")),
+        "logo": os.path.join("Logo", "tesla_logo.png")
+    },
+    "Walmart": {
+        "model": os.path.join("Trained Models", "Keras", "Walmart_model.keras"),
+        "last_sequence": np.load(os.path.join("Trained Models", "Last Sequences", "Walmart_last_sequence.npy")),
+        "logo": os.path.join("Logo", "walmart_logo.png")
     }
 }
 
